@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 
 from .formats import FORMATS
 from .models import ProductBrief
-from .script_writer import SYSTEM_PROMPT, build_prompt, check_script, generate_script
+from .script_writer import DEFAULT_MODELS, SYSTEM_PROMPT, build_prompt, check_script, generate_script
 
 
 def main() -> int:
@@ -52,8 +52,14 @@ def main() -> int:
 
     from google import genai
 
+    models = [m.strip() for m in os.getenv("GEMINI_MODELS", "").split(",") if m.strip()] or DEFAULT_MODELS
     client = genai.Client(api_key=api_key)
-    result = generate_script(brief, fmt, client, os.getenv("GEMINI_MODEL", "gemini-flash-latest"))
+    try:
+        result = generate_script(brief, fmt, client, models)
+    except RuntimeError as e:
+        print(e, file=sys.stderr)
+        print("Google's free tier is probably busy. Try again in a few minutes.", file=sys.stderr)
+        return 1
 
     args.out.mkdir(parents=True, exist_ok=True)
     out_file = args.out / f"{brief.id}__{fmt.id}.json"
