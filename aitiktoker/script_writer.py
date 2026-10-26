@@ -2,12 +2,12 @@
 
 import re
 import sys
-import time
 
 from google import genai
-from google.genai import errors, types
+from google.genai import types
 
 from .formats import ComedyFormat
+from .gemini import call_with_fallback
 from .models import ProductBrief, VideoScript
 
 SYSTEM_PROMPT = """\
@@ -39,7 +39,7 @@ def build_prompt(brief: ProductBrief, fmt: ComedyFormat) -> str:
     )
 
 
-# Tried in order. Free-tier keys often get "high demand" errors, so a busy model falls through to the next.
+# Tried in order when a model is busy.
 DEFAULT_MODELS = [
     "gemini-3.8-flash",
     "gemini-flash-latest",
@@ -48,48 +48,22 @@ DEFAULT_MODELS = [
     "gemini-flash-lite-latest",
 ]
 
-# Overloaded or rate limited: worth waiting and trying again.
-RETRYABLE_CODES = {429, 500, 503, 504}
-
 
 def generate_script(
-    brief: ProductBrief,
-    fmt: ComedyFormat,
-    client: genai.Client,
-    models: list[str],
-    attempts_per_model: int = 3,
-    first_wait_sec: float = 2.0,
+    brief: ProductBrief, fmt: ComedyFormat, client: genai.Client, models: list[str]
 ) -> VideoScript:
-    """Tries each model in turn, retrying busy ones with growing waits (2s, 4s, ...)."""
     config = types.GenerateContentConfig(
         system_instruction=SYSTEM_PROMPT,
         response_mime_type="application/json",
         response_schema=VideoScript,
         temperature=1.0,
     )
-    last_error: Exception | None = None
-
-    for model in models:
-        for attempt in range(1, attempts_per_model + 1):
-            try:
-                response = client.models.generate_content(
-                    model=model, contents=build_prompt(brief, fmt), config=config
-                )
-                print(f"Script written by {model}.", file=sys.stderr)
-                return VideoScript.model_validate_json(response.text)
-            except errors.APIError as e:
-                last_error = e
-                if e.code not in RETRYABLE_CODES:
-                    print(f"{model}: {e.code} {e.status}, skipping this model.", file=sys.stderr)
-                    break
-                if attempt == attempts_per_model:
-                    print(f"{model}: still busy after {attempt} tries, moving on.", file=sys.stderr)
-                    break
-                wait = first_wait_sec * 2 ** (attempt - 1)
-                print(f"{model}: {e.code} {e.status}, retrying in {wait:g}s...", file=sys.stderr)
-                time.sleep(wait)
-
-    raise RuntimeError(f"Every model failed. Last error: {last_error}")
+    response, model = call_with_fallback(
+        models,
+        lambda m: client.models.generate_content(model=m, contents=build_prompt(brief, fmt), config=config),
+    )
+    print(f"Script written by {model}.", file=sys.stderr)
+    return VideoScript.model_validate_json(response.text)
 
 
 def check_script(brief: ProductBrief, script: VideoScript) -> list[str]:

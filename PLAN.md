@@ -47,7 +47,7 @@ products, aimed at Gen Z / Gen Alpha. The system should eventually go from
 |---|---|
 | Language | Python 3.12 |
 | Scripts | Gemini API (free tier, key from aistudio.google.com) |
-| Voice | edge-tts (Thai voices: `th-TH-PremwadeeNeural`, `th-TH-NiwatNeural`); Piper/Kokoro as fallback |
+| Voice | Gemini TTS voice "Puck" (free tier); edge-tts `th-TH-PremwadeeNeural` as backup |
 | Editing | FFmpeg + MoviePy |
 | Captions | faster-whisper (local) |
 | Scheduling | Windows Task Scheduler |
@@ -78,7 +78,7 @@ Every format ends with an honest one-liner on price/value and a call to action t
 
 - [x] Repo created
 - [x] Script generator (Gemini, Thai, structured JSON output)
-- [ ] Thai voice-over
+- [x] Thai voice-over (Gemini TTS "Puck", edge-tts Premwadee as backup)
 - [ ] Video assembly
 - [ ] Captions
 - [ ] Review step
