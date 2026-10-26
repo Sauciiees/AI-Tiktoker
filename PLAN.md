@@ -79,8 +79,9 @@ Every format ends with an honest one-liner on price/value and a call to action t
 - [x] Repo created
 - [x] Script generator (Gemini, Thai, structured JSON output)
 - [x] Thai voice-over (Gemini TTS "Puck", edge-tts Premwadee as backup)
-- [ ] Video assembly
-- [ ] Captions
+- [x] Video assembly v1 (color cards, big text, timed captions)
+- [x] Product photos in the video (one per scene, slow zoom)
+- [ ] Word-accurate captions (faster-whisper)
 - [ ] Review step
 - [ ] Publisher
 - [ ] Analytics

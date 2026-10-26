@@ -11,5 +11,10 @@
     "ใช้ไฟ USB"
   ],
   "audience": "นักเรียน นักศึกษา คนอยู่หอ คนชอบแต่งห้อง",
-  "notes": "ไม่กันน้ำ ใช้ในบ้านเท่านั้น"
+  "notes": "ไม่กันน้ำ ใช้ในบ้านเท่านั้น",
+  "images": [
+    "images/sample-led-strip/placeholder-square.png",
+    "images/sample-led-strip/placeholder-portrait.png",
+    "images/sample-led-strip/placeholder-landscape.png"
+  ]
 }

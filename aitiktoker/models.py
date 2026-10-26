@@ -11,6 +11,9 @@ class ProductBrief(BaseModel):
     features: list[str]
     audience: str
     notes: str = ""
+    images: list[str] = Field(
+        default=[], description="Product photo files, relative to the brief file; shown in the video in turn"
+    )
 
 
 class Scene(BaseModel):

@@ -35,7 +35,7 @@ def build_prompt(brief: ProductBrief, fmt: ComedyFormat) -> str:
     return (
         f"Comedy format: {fmt.name}\n"
         f"Format instructions: {fmt.instructions}\n\n"
-        f"Product brief (the only facts you may use):\n{brief.model_dump_json(indent=2)}\n"
+        f"Product brief (the only facts you may use):\n{brief.model_dump_json(indent=2, exclude={"images"})}\n"
     )
 
 
